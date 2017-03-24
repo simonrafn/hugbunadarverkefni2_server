@@ -5,10 +5,20 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
+
+
+/* firebase start */
+var admin = require("firebase-admin");
+var serviceAccount = require("./cloudmessagingtest2-246fb-firebase-adminsdk-ebnkx-0e73aedfec.json");
+// var serviceAccount = require("path/to/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://cloudmessagingtest2-246fb.firebaseio.com/"
+  // databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
+});
+/* firebase end */
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,8 +32,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+// routes
+// var index = require('./routes/index');
+// app.use('/', index);
+
+var register = require('./routes/register')(admin);
+app.use('/register', register);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
