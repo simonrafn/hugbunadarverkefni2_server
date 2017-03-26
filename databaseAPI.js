@@ -1,40 +1,41 @@
+'use strict';
 let sqlite3 = require('sqlite3').verbose();
-let db = new sqlite3.Dtabase("./cdm.db");
+let db = new sqlite3.Database("./cdm.db");
 
 let CREATE_TABLE_USER = 
             "CREATE TABLE IF NOT EXISTS users (" +
-            " id AUTOINCREMENT INTEGER PRIMARY KEY," + 
-            " firebase_uid TEXT ," + 
-            " username TEXT " + 
-            " email TEXT )"; 
+            " id            INTEGER     PRIMARY KEY AUTOINCREMENT   , " + 
+            " firebase_uid  TEXT                                    , " + 
+            " username      TEXT                                    , " + 
+            " email         TEXT                                    ) " ; 
 
 let CREATE_TABLE_TOKENS = 
             "CREATE TABLE IF NOT EXISTS tokens (" +
-            " id INTEGER PRIMARY KEY, " +
-            " instance_token TEXT )" +
+            " id                INTEGER     PRIMARY KEY , " +
+            " instance_token    TEXT                    ) " ;
 
 let CREATE_TABLE_MESSAGES = 
-            "CREATE TABLE IF NOT EXISTS messages (" +
-            " content TEXT, " +
-            " sender INTEGER, " + 
-            " receiver INTEGER, " +
-            " sent_time INTEGER )"; 
+            "CREATE TABLE IF NOT EXISTS messages ("     +
+            " content       TEXT                    , " +
+            " sender        INTEGER                 , " + 
+            " receiver      INTEGER                 , " +
+            " sent_time     INTEGER                 ) " ; 
 
 let CREATE_TABLE_CONTACTS =
-            "CREATE TABLE IF NOT EXISTS contacts (" +
-            " user_id INTEGER PRIMARY KEY, " + 
-            " friend_id INTEGER"
-            " blocked BOOLEAN )";
+            "CREATE TABLE IF NOT EXISTS contacts ("     +
+            " user_id       INTEGER     PRIMARY KEY , " + 
+            " friend_id     INTEGER                 , " +
+            " blocked       BOOLEAN                 ) " ;
 
-db.run(CREATE_TABLE_MESSAGES);
-db.run(CREATE_TABLE_CONTACTS);
 db.run(CREATE_TABLE_USER);
 db.run(CREATE_TABLE_TOKENS);
+db.run(CREATE_TABLE_MESSAGES);
+db.run(CREATE_TABLE_CONTACTS);
 
 function insertUser(uid, instanceToken, username, email) {
 	return new Promise(function(resolve, reject) {
 		let userSql = "INSERT INTO users (firebase_uid, email, username) VALUES (?, ?, ?)";
-		let tokenSql = "INSERT INTO tokens (id, token) values (?, ?)";
+		let tokenSql = "INSERT INTO tokens (id, instance_token) values (?, ?)";
 		var userId;
 		db.serialize(function() {
 			db.run("BEGIN");
@@ -42,7 +43,7 @@ function insertUser(uid, instanceToken, username, email) {
 				if(err) {
 					reject(err)
 				}
-				userId = this.lastID;
+				let userId = this.lastID;
 				db.run(tokenSql, [userId, instanceToken], function(err) {
 					if(err) {
 						db.run("ROLLBACK");
@@ -51,7 +52,7 @@ function insertUser(uid, instanceToken, username, email) {
 				});
 			});
 			db.run("COMMIT");
-		}
+		});
 	});
 }
 
