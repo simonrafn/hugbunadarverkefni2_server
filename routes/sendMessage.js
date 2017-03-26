@@ -5,46 +5,52 @@
 var express = require('express');
 var router = express.Router();
 
+var database = require('../databaseAPI.js');
+
 var admin;
 
 module.exports = function(ad) {
 	admin = ad;
 	router.post('/', function(req, res, next) {
-		console.log("I got a POST request on /register :D");
-
 		var userIdToken = req.body.firebaseUserIdToken;
-		var instanceToken = req.body.firebaseInstanceIdToken;
+		var content = req.body.content;
+		var senderId = req.body.senderId;
+		var receiverId = req.body.receiverId;
+		var sentDate = req.body.sentDate;
 
-		sendMessage();
+		// verify the user
+		admin.auth().verifyIdToken(userIdToken)
+			.then(function(decodedToken) {
+			// var uid = decodedToken.uid;
+			
+			var payload = {
+				notification : {
+					title : "",
+					body : content
+				},
+				data : {
+					content : content,
+					senderId : senderId,
+					receiverId : receiverId,
+					sentDate : sentDate
+				}
+			};
 
-		var response = { "response" : "This is a response from the server to a POST request on /register!"};
-		res.send(response);
+			database.getInstanceTokens(receiverId).then(function(instanceTokens) { sendMessage(instanceTokens, payload); });
+			database.insertMessage(content, senderId, receiverId, sentDate);
+		}).catch(function(error) {
+			// Handle error
+			console.log("admin.auth(), error verifying userIdToken: " + error);
+		});
 	});
 
 	return router;
 }
-
-function sendMessage(instanceToken, payload) {
-	// This instance token comes from the client FCM SDKs.
-	// var instanceToken = "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...";
-
-
-	// See the "Defining the message payload" section below for details
-	// on how to define a message payload.
-	/*var payload = {
-		notification: {
-			title : "title",
-			body : "body"
-		},
-		data: {
-		score: "850",
-		time: "2:45"
-		}
-	};*/
-
-	// Send a message to the device corresponding to the provided
-	// registration token.
-	admin.messaging().sendToDevice(instanceToken, payload)
+	
+function sendMessage(instanceTokens, payload) {
+	// Send a message to the devices corresponding to the provided
+	// instance tokens.
+	admin.messaging().sendToDevice(instanceTokens, payload)
 		.then(function(response) {
 		// See the MessagingDevicesResponse reference documentation for
 		// the contents of response.

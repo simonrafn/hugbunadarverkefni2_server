@@ -5,21 +5,14 @@
 var express = require('express');
 var router = express.Router();
 
-var admin;
+var database = require('../databaseAPI.js');
 
-module.exports = function(ad) {
-	admin = ad;
-	router.post('/', function(req, res, next) {
-		console.log("I got a POST request on /register :D");
+router.post('/', function(req, res, next) {
+	var searchString = req.body.searchString;
+	console.log("post request on /searchForContact");
+	res.setHeader('Content-Type', 'application/json');
+	res.send({ response : "searchForContact"});
+	// database.searchForContact(searchString).then(function(result) { res.send({ userId : result.userId, username : result.username }); });
+});
 
-		var userIdToken = req.body.firebaseUserIdToken;
-		var instanceToken = req.body.firebaseInstanceIdToken;
-
-		// call stuff here
-
-		var response = { "response" : "This is a response from the server to a POST request on /register!"};
-		res.send(response);
-	});
-
-	return router;
-}
+module.exports = router;
