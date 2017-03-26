@@ -130,7 +130,7 @@ module.exports = (function() {
 
     function addContact (adderId, addedId) {
         return new Promise(function(resolve, reject) {
-            let sql = "INSERT INTO contacts (user_id, friend_id, blocked) values (?, ?, false)";
+            let sql = "INSERT INTO contacts (user_id, friend_id, blocked) values (?, ?, 'false')";
             db.run(sql, [adderId, addedId], function(err) {
                 if(err) reject(err);
                 resolve();
