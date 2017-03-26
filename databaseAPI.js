@@ -56,16 +56,6 @@ function insertUser(uid, instanceToken, username, email) {
 	});
 }
 
-function insertToken(userId, instanceToken) {
-	return new Promise(function(resolve, reject) {
-		let sql = "INSERT INTO tokens (id, instance_token) values (?, ?)";
-		db.run(sql, [userId, instanceToken], function(err) {
-			if(err) reject(err);
-			resolve(inserToken)
-		})
-	});
-}
-
 module.exports.insertOrUpdateUser = function(uid, instanceToken, username, email) {
     let sql = "SELECT EXISTS ( SELECT id FROM users WHERE firebase_uid = ? LIMIT 1 )";
     return new Promise(function(resolve, reject) {
@@ -74,10 +64,30 @@ module.exports.insertOrUpdateUser = function(uid, instanceToken, username, email
         	if (row === 0) 
         		resolve(insertUser(uid, instanceToken, username, email));
         	else {
-        		resolve(updateUser(uid, instanceToken, username, email));
+        		resolve(insertToken(uid, instanceToken));
         	}
         })
-    });  
+    });
+}
+
+function insertToken(userId, instanceToken) {
+	return new Promise(function(resolve, reject) {
+		let sql = "INSERT INTO tokens (id, instance_token) values (?, ?)";
+		db.run(sql, [userId, instanceToken], function(err) {
+			if(err) reject(err);
+			resolve(row);
+		})
+	});
+}
+
+module.exports.getInstanceTokens = function(userId) {
+	return new Promise(function(resolve, reject) {
+		let sql = "SELECT * FROM tokens WHERE id = ?";
+		db.run(sql, [userId], function(err, row) {
+			if(err) reject(err);
+			resolve(row);
+		});
+	});
 }
 
 module.exports.insertMessage = function(content, senderId, receiverId, sentTime) {
