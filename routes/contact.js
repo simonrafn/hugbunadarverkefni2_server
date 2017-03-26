@@ -1,3 +1,4 @@
+'use strict';
 // start node servernum:
 // cd C:\Users\Notandi\Documents\GitHub\hugbunadarverkefni2_server
 // npm start
@@ -7,48 +8,71 @@ var router = express.Router();
 
 var database = require('../databaseAPI.js');
 
-var admin;
-
-module.exports = function(ad) {
-	admin = ad;
+module.exports = function(admin) {
 	router.post('/block', function(req, res, next) {
-		// databaseAction(req, database.blockContact);
-		console.log("post request on /block");
+		var userIdToken = req.body.firebaseUserIdToken;
 		res.setHeader('Content-Type', 'application/json');
-		res.send({ response : "block"});
+		// verify the user
+		admin.auth().verifyIdToken(userIdToken)
+			.then(function(decodedToken) { 
+				return database.blockContact(req.body.userId, req.body.subjectId)
+					.then(function() { 
+						res.send({ response: "success" }); 
+					}); 
+			})
+			.catch(function(error) { 
+				console.log("admin.auth(), error verifying userIdToken" + error); 
+				res.status(500); 
+			});
 	});
 	router.post('/unblock', function(req, res, next) {
-		// databaseAction(req, database.unblockContact);
-		console.log("post request on /unblock");
+		var userIdToken = req.body.firebaseUserIdToken;
 		res.setHeader('Content-Type', 'application/json');
-		res.send({ response : "unblock"});
+		// verify the user
+		admin.auth().verifyIdToken(userIdToken)
+			.then(function(decodedToken) { 
+				return database.unblockContact(req.body.userId, req.body.subjectId)
+					.then(function() { 
+						res.send({ response: "success" });
+					}); 
+			})
+			.catch(function(error) { 
+				console.log("admin.auth(), error verifying userIdToken" + error); 
+				res.status(500); 
+			});
 	});
 	router.post('/add', function(req, res, next) {
-		// databaseAction(req, database.addContact);
-		console.log("post request on /add");
+		var userIdToken = req.body.firebaseUserIdToken;
 		res.setHeader('Content-Type', 'application/json');
-		res.send({ response : "add"});
+		// verify the user
+		admin.auth().verifyIdToken(userIdToken)
+			.then(function(decodedToken) { 
+				return database.addContact(req.body.userId, req.body.subjectId)
+					.then(function() { 
+						res.send({ response: "success" });
+					}); 
+			})
+			.catch(function(error) { 
+				console.log("admin.auth(), error verifying userIdToken" + error); 
+				res.status(500); 
+			});
 	});
 	router.post('/delete', function(req, res, next) {
-		// databaseAction(req, database.deleteContact);
-		console.log("post request on /delete");
+		var userIdToken = req.body.firebaseUserIdToken;
 		res.setHeader('Content-Type', 'application/json');
-		res.send({ response : "delete"});
+		// verify the user
+		admin.auth().verifyIdToken(userIdToken)
+			.then(function(decodedToken) { 
+				return database.deleteContact(req.body.userId, req.body.subjectId)
+					.then(function() { 
+						res.send({ response: "success" });
+					}); 
+			})
+			.catch(function(error) { 
+				console.log("admin.auth(), error verifying userIdToken" + error); 
+				res.status(500); 
+			});
 	});
 
 	return router;
 }
-
-function databaseAction(req, dbfunction) {
-	// verify the user
-	admin.auth().verifyIdToken(userIdToken)
-		.then(function(decodedToken) {
-		// var uid = decodedToken.uid;
-		
-		dbfunction(req.userId, req.subjectId);
-	}).catch(function(error) {
-		// Handle error
-		console.log("admin.auth(), error verifying userIdToken: " + error);
-	});
-}
-

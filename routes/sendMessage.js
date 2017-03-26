@@ -1,3 +1,4 @@
+'use strict';
 // start node servernum:
 // cd C:\Users\Notandi\Documents\GitHub\hugbunadarverkefni2_server
 // npm start

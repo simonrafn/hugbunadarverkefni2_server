@@ -121,7 +121,7 @@ module.exports = (function() {
     function searchForContact (searchString) {
         return new Promise(function(resolve, reject) {
             let sql = "SELECT id, username FROM users WHERE username = ?";
-            db.get(sql, searchString, function(err,row) {
+            db.get(sql, [searchString], function(err,row) {
                 if(err) reject(err);
                 resolve(row);
             });
@@ -138,7 +138,7 @@ module.exports = (function() {
         });
     }
 
-    function setBlocked(blockerId, bockedId, blockState) {
+    function setBlocked(blockerId, blockedId, blockedState) {
         return new Promise(function(resolve, reject) {
             let sql = "UPDATE contacts SET blocked = ? WHERE user_id=? AND friend_id = ?";
             db.run(sql, [blockerId, blockedId, blockedState], function(err) {
@@ -148,9 +148,9 @@ module.exports = (function() {
         });
     }
 
-    function blockContact (blockerId, bockedId) { return setBLocked(blockerId, blockedId, false);};
+    function blockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, true);};
 
-    function unblockContact (blockerId, bockedId) { return setBLocked(blockerId, blockedId, true);};
+    function unblockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, false);};
 
     function deleteContact (deleterId, deletedId) {
         return new Promise(function(resolve, reject) {
@@ -165,6 +165,7 @@ module.exports = (function() {
     return {
         deleteContact : deleteContact,
         blockContact : blockContact,
+        unblockContact : unblockContact,
         addContact : addContact,
         searchForContact : searchForContact,
         insertMessage : insertMessage,

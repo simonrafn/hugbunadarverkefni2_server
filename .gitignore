@@ -4,3 +4,4 @@ cloudmessagingtest2-246fb-firebase-adminsdk-ebnkx-0e73aedfec.json
 OLD*
 *.db
 test*
+*debug.log
