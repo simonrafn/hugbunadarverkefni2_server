@@ -13,8 +13,8 @@ router.post('/', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	// res.send({ response : "searchForContact"});
 	database.searchForContact(searchString)
-		.then(function(result) { console.log("userId: ", result.id); console.log("username: ", result.username); res.send({ userId : result.id, username : result.username }); })
-		.catch( function(error) { res.status(500); } );
+		.then(function(result) { if(result) { res.send({ userId : result.id, username : result.username }); } else { res.status(500); } })
+		.catch( function(error) { console.log("error: ", error); res.status(500); } );
 });
 
 module.exports = router;
