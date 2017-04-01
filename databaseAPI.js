@@ -31,11 +31,18 @@ module.exports = (function() {
                 " blocked       BOOLEAN                 , " +
                 " UNIQUE( user_id, friend_id )          ) " ;
 
+    let CREATE_TABLE_REQUESTS = 
+    			"CREATE TABLE IF NOT EXISTS requests ("		+
+    			" sender_id		INTEGER		 			,"	+
+    			" receiver_id 	INTEGER					,"	+
+    			" UNIQUE( sender_id, receiver_id )		)"	;
+
     db.serialize(function() {
         db.run(CREATE_TABLE_USER);
         db.run(CREATE_TABLE_TOKENS);
         db.run(CREATE_TABLE_MESSAGES);
         db.run(CREATE_TABLE_CONTACTS);
+        db.run(CREATE_TABLE_REQUESTS);
     })
 
     function insertUser(uid, instanceToken, username, email) {
@@ -162,7 +169,60 @@ module.exports = (function() {
         });
     }
 
+    function addFriendRequest (senderId, receiverId) {
+    	return new Promise((resolve,reject) => {
+    		let sql = "INSERT INTO requests (sender_id, receiver_id) VALUES (?, ?)";
+    		db.run(sql, [senderId, receiverId], err =>{
+    			if(err) reject(err);
+    			resolve();
+    		});
+    	});
+    }
+
+    function existsFriendRequest (senderId, receiverId) {
+    	return new Promise((resolve,reject) => {
+    		let sql = "SELECT sender_id, receiver_id FROM requests " + 
+    					"WHERE sender_id = ? AND receiver_id = ?";
+    		db.get(sql, [senderId, receiverId], (err,row) => {
+    			if(err) reject(err);
+    			if(row)
+    				resolve(true);
+    			else
+    				resolve(false);
+    		});
+    	});
+    }
+
+    function areFriends (userId, otherId) {
+    	return new Promise((resolve,reject) => {
+    		let sql = " SELECT sender_id FROM requests " + 
+    				" WHERE (sender_id = ? AND receiver_id = ?) " +
+    				" OR (sender_id = ? AND receiver_id = ?) ";
+			db.get(sql, [userId, otherId, otherId, userId], (err,row) => {
+				if(err) reject(err);
+				if(row)
+					resolve(true);
+				else
+					resolve(false);
+			});
+    	});
+    }
+
+    function deleteFriendRequest (senderId, receiverId) {
+    	return new Promise((resolve,reject) => {
+    		let sql = "DELETE FROM requests WHERE " +
+    					" sender_id = ? AND receiver_id = ?";
+    		db.run(sql, [senderId, receiverId], err => {
+    			if(err) reject(err);
+    			resolve();
+    		});
+    	});
+    }
+
     return {
+	    deleteFriendRequest : deleteFriendRequest,
+	    areFriends : areFriends,
+	    existsFriendRequest : existsFriendRequest,
         deleteContact : deleteContact,
         blockContact : blockContact,
         unblockContact : unblockContact,
