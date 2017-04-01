@@ -17,11 +17,11 @@ module.exports = function(admin) {
 			.then(function(decodedToken) { 
 				return database.blockContact(req.body.userId, req.body.subjectId)
 					.then(function() { 
-						res.send({ response: "success" }); 
+						res.send({ response: "success" });
 					}); 
 			})
 			.catch(function(error) { 
-				console.log("admin.auth(), error verifying userIdToken" + error); 
+				console.log("admin.auth(), error verifying userIdToken", error); 
 				res.status(500); 
 			});
 	});
@@ -37,7 +37,7 @@ module.exports = function(admin) {
 					}); 
 			})
 			.catch(function(error) { 
-				console.log("admin.auth(), error verifying userIdToken" + error); 
+				console.log("admin.auth(), error verifying userIdToken", error); 
 				res.status(500); 
 			});
 	});
@@ -53,7 +53,7 @@ module.exports = function(admin) {
 					}); 
 			})
 			.catch(function(error) { 
-				console.log("admin.auth(), error verifying userIdToken" + error); 
+				console.log("admin.auth(), error verifying userIdToken", error); 
 				res.status(500); 
 			});
 	});
@@ -94,8 +94,8 @@ module.exports = function(admin) {
 			.then(instanceTokens => sendMessage(instanceTokens, payload))
 			.then(_ => database.addFriendRequest(userId, subjectId))
 			.catch(err => {
-				console.log("Error sending friend request: " + err);
-				res.status(500;)
+				console.log("Error sending friend request: ", err);
+				res.status(500);
 			});
 
 	});
@@ -130,7 +130,7 @@ module.exports = function(admin) {
 			.then(_ => database.getInstanceTokens(subjectId))
 			.then(instanceTokens => sendMessage(instanceTokens, payload))
 			.catch(err => { 
-				console.log("Error accepting friend request: " + err); 
+				console.log("Error accepting friend request: ", err); 
 				res.status(500); 
 			});
 	});
@@ -143,7 +143,7 @@ module.exports = function(admin) {
 		admin.auth().verifyIdToken(userIdToken)
 			.then(decodedToken => database.deleteFriendRequest(subjectId, userId))
 			.catch(err => { 
-				console.log("Error rejecting friend request: " + err); 
+				console.log("Error rejecting friend request: ", err); 
 				res.status(500); 
 			});
 	});

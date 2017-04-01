@@ -42,7 +42,7 @@ module.exports = function(ad) {
 			database.insertMessage(content, senderId, receiverId, sentDate);
 		}).catch(function(error) {
 			// Handle error
-			console.log("admin.auth(), error verifying userIdToken: " + error);
+			console.log("Error sending chat message: ", error);
 		});
 	});
 

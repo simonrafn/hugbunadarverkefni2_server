@@ -27,16 +27,15 @@ module.exports = function(ad) {
 				// console.log("Successfully fetched user data:", userRecord.toJSON());
 				var username = userRecord.displayName;
 				var email = userRecord.email;
-
 				res.setHeader('Content-Type', 'application/json');
 				// get the userId from the database and send the result to the client app
 				database.insertOrUpdateUser(uid, instanceToken, username, email).then(function(userId) { res.send({ userId : userId }); });
 			}).catch(function(error) {
-				console.log("Error fetching user data:", error);
+				console.log("Error fetching user data: ", error);
 			});
 		}).catch(function(error) {
 			// Handle error
-			console.log("admin.auth(), error verifying userIdToken: " + error);
+			console.log("Error registering user ", error);
 		});
 	});
 
