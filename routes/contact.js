@@ -95,7 +95,7 @@ module.exports = function(admin) {
 			.then(_ => database.addFriendRequest(userId, subjectId))
 			.catch(err => {
 				console.log("Error sending friend request: " + err);
-				res.status(500;)
+				res.status(500);
 			});
 
 	});
