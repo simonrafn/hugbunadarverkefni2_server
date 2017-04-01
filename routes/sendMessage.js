@@ -30,6 +30,7 @@ module.exports = function(ad) {
 					body : content
 				},
 				data : {
+					messageType : "chatMessage",
 					content : content,
 					senderId : senderId,
 					receiverId : receiverId,

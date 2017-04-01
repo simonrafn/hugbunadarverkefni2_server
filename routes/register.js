@@ -31,7 +31,7 @@ module.exports = function(ad) {
 				res.setHeader('Content-Type', 'application/json');
 				// get the userId from the database and send the result to the client app
 				database.insertOrUpdateUser(uid, instanceToken, username, email).then(function(userId) { res.send({ userId : userId }); });
-			}) .catch(function(error) {
+			}).catch(function(error) {
 				console.log("Error fetching user data:", error);
 			});
 		}).catch(function(error) {
