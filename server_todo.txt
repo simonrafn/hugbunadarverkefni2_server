@@ -1,0 +1,51 @@
+-------------------------------------
+-----------  Server      ------------
+createTable requests
+dropTable
+addFriendRequest
+existsFriendRequest
+areFriends
+deleteFriendRequest
+
+-------------------------------------
+--------  Client-side   -------------
+
+Contact extends FriendRequest
+
+contactManager 
+	getUpstreamRequests
+	addDownstreamRequest
+	deleteDownstreamReqest
+
+dbHelper
+	getUpstreamRequests
+	addDownstreamRequest
+	deleteDownstreamReqest
+	createTable
+	dropTable
+
+
+fbMSg = {
+		msgType: "chat"
+		contact: {
+			name:jonas,
+			etc
+		}
+	}
+
+fbMSg = {
+		msgType: "friendRequest"
+		contact: {
+			name: wantedFriend,
+			etc
+		}
+	}
+
+fbMSg = {
+		msgType: "friendResponse"
+		contact: {
+			name: requester
+			etc
+		}
+	}
+
