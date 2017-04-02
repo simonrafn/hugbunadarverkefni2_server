@@ -34,7 +34,7 @@ router.post('/', function(req, res, next) {
 		.then(areFriends => {
 			if(areFriends) return database.getInstanceTokens(receiverId);
 			throw "The users are not friends";
-		}
+		})
 		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
 		.then(addToDatabase => database.insertMessage(content, senderId, receiverId, sentTime))
 		.then(_ => res.send({success: "Message has been sent"}))
