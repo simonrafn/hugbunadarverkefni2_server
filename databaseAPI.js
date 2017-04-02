@@ -5,33 +5,33 @@ let db = new sqlite3.Database("./cdm.db");
 
 module.exports = (function() {
 
-    let CREATE_TABLE_USER = 
+    let CREATE_TABLE_USER =
                 "CREATE TABLE IF NOT EXISTS users (" +
-                " id            INTEGER     PRIMARY KEY AUTOINCREMENT   , " + 
-                " firebase_uid  TEXT                                    , " + 
-                " username      TEXT                                    , " + 
-                " email         TEXT                                    ) " ; 
+                " id            INTEGER     PRIMARY KEY AUTOINCREMENT   , " +
+                " firebase_uid  TEXT                                    , " +
+                " username      TEXT                                    , " +
+                " email         TEXT                                    ) " ;
 
-    let CREATE_TABLE_TOKENS = 
+    let CREATE_TABLE_TOKENS =
                 "CREATE TABLE IF NOT EXISTS tokens (" +
                 " id                INTEGER                 , " +
                 " instance_token    TEXT          UNIQUE    ) " ;
 
-    let CREATE_TABLE_MESSAGES = 
+    let CREATE_TABLE_MESSAGES =
                 "CREATE TABLE IF NOT EXISTS messages ("     +
                 " content       TEXT                    , " +
-                " sender        INTEGER                 , " + 
+                " sender        INTEGER                 , " +
                 " receiver      INTEGER                 , " +
-                " sent_time     INTEGER                 ) " ; 
+                " sent_time     INTEGER                 ) " ;
 
     let CREATE_TABLE_CONTACTS =
                 "CREATE TABLE IF NOT EXISTS contacts ("     +
-                " user_id       INTEGER                 , " + 
+                " user_id       INTEGER                 , " +
                 " friend_id     INTEGER                 , " +
                 " blocked       BOOLEAN                 , " +
                 " UNIQUE( user_id, friend_id )          ) " ;
 
-    let CREATE_TABLE_REQUESTS = 
+    let CREATE_TABLE_REQUESTS =
     			"CREATE TABLE IF NOT EXISTS requests ("		+
     			" sender_id		INTEGER		 			,"	+
     			" receiver_id 	INTEGER					,"	+
@@ -118,7 +118,7 @@ module.exports = (function() {
 
     function insertMessage (content, senderId, receiverId, sentTime) {
         return new Promise(function(resolve, reject) {
-            let sql = "INSERT INTO messages (content, sender, receiver, sent_time)" + 
+            let sql = "INSERT INTO messages (content, sender, receiver, sent_time)" +
                         " VALUES (?, ?, ?, ?)";
             db.run(sql, [content, senderId, receiverId, sentTime], function(err) {
                 if(err) reject(err);
@@ -139,7 +139,7 @@ module.exports = (function() {
 
     function addContact (adderId, addedId) {
         return new Promise(function(resolve, reject) {
-            let sql = "INSERT INTO contacts (user_id, friend_id, blocked) values (?, ?, 'false')";
+            let sql = "INSERT INTO contacts (user_id, friend_id, blocked) values (?, ?, '0')";
             db.run(sql, [adderId, addedId], function(err) {
                 if(err) reject(err);
                 resolve();
@@ -157,9 +157,9 @@ module.exports = (function() {
         });
     }
 
-    function blockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, true);};
+    function blockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, 1);};
 
-    function unblockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, false);};
+    function unblockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, 0);};
 
     function deleteContact (deleterId, deletedId) {
         return new Promise(function(resolve, reject) {
@@ -197,7 +197,7 @@ module.exports = (function() {
 
     function areFriends (userId, otherId) {
     	return new Promise((resolve,reject) => {
-    		let sql = " SELECT user_id FROM contacts " + 
+    		let sql = " SELECT user_id FROM contacts " +
     				" WHERE user_id = ? AND friend_id = ?";
 			db.get(sql, [userId, otherId], (err,row) => {
 				if(err) reject(err);
@@ -211,17 +211,18 @@ module.exports = (function() {
 
     function hasBlocked (userId, otherId) {
         return new Promise((resolve,reject) => {
-            let sql = " SELECT blocked FROM contacts " + 
+            let sql = "SELECT blocked FROM contacts " +
                     " WHERE user_id = ? AND friend_id = ?";
             db.get(sql, [userId, otherId], (err,row) => {
                 if(err) reject(err);
-                if(row && row.blocked)
+                console.log(row.blocked);
+                if(row && row.blocked === 1)
                     resolve(true);
                 else
                     resolve(false);
             });
         });
-    }    
+    }
 
     function deleteFriendRequest (senderId, receiverId) {
     	return new Promise((resolve,reject) => {
