@@ -209,6 +209,20 @@ module.exports = (function() {
     	});
     }
 
+    function hasBlocked (userId, otherId) {
+        return new Promise((resolve,reject) => {
+            let sql = " SELECT blocked FROM contacts " + 
+                    " WHERE user_id = ? AND friend_id = ?";
+            db.get(sql, [userId, otherId], (err,row) => {
+                if(err) reject(err);
+                if(row && row.blocked)
+                    resolve(true);
+                else
+                    resolve(false);
+            });
+        });
+    }    
+
     function deleteFriendRequest (senderId, receiverId) {
     	return new Promise((resolve,reject) => {
     		let sql = "DELETE FROM requests WHERE " +
@@ -221,6 +235,7 @@ module.exports = (function() {
     }
 
     return {
+        hasBlocked : hasBlocked,
         addFriendRequest : addFriendRequest,
 	    deleteFriendRequest : deleteFriendRequest,
 	    areFriends : areFriends,

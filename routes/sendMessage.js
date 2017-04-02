@@ -32,8 +32,12 @@ router.post('/', function(req, res, next) {
 
 	database.areFriends(senderId, receiverId)
 		.then(areFriends => {
-			if(areFriends) return database.getInstanceTokens(receiverId);
+			if(areFriends) return database.hasBlocked(receiverId, senderId);
 			throw "The users are not friends";
+		})
+		.then(hasBlocked => {
+			if(!hasBlocked) return database.getInstanceTokens(receiverId);
+			throw "The receiver has blocked the sender";
 		})
 		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
 		.then(addToDatabase => database.insertMessage(content, senderId, receiverId, sentTime))
