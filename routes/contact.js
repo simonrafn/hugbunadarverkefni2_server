@@ -60,18 +60,14 @@ router.post('/add', function(req, res, next) {
 	database.existsFriendRequest(userId, subjectId)
 		.then(existsFriendRequest => {
 			if(!existsFriendRequest) return database.areFriends(userId, subjectId);
-			return true;
+			throw "The friend request already exists";
 		})
 		.then(areFriends => {
 			if(!areFriends) return database.getInstanceTokens(subjectId);
+			throw "The users are already friends";
 		})
-		.then(instanceTokens => {
-			if(instanceTokens && instanceTokens.length != 0) return firebase.sendMessage(instanceTokens, payload);
-			return false;
-		})
-		.then(addToDatabase => {
-			if(addToDatabase) database.addFriendRequest(userId, subjectId);
-		})
+		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
+		.then(addToDatabase => database.addFriendRequest(userId, subjectId))
 		.then(_ => res.send({success: "Friend request has been sent"}))
 		.catch(err => {
 			console.log("Error sending friend request: ", err);

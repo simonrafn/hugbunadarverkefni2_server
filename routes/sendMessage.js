@@ -31,20 +31,15 @@ router.post('/', function(req, res, next) {
 	};
 
 	database.areFriends(senderId, receiverId)
-		.then(areFriends =>
+		.then(areFriends => {
 			if(areFriends) return database.getInstanceTokens(receiverId);
-			return false;
+			throw "The users are not friends";
 		}
-		.then(instanceTokens => {
-			if(instanceTokens) return firebase.sendMessage(instanceTokens, payload);
-			return false;
-		})
-		.then(addToDatabase => {
-			if(addToDatabase) database.insertMessage(content, senderId, receiverId, sentTime);
-		}
+		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
+		.then(addToDatabase => database.insertMessage(content, senderId, receiverId, sentTime))
 		.then(_ => res.send({success: "Message has been sent"}))
 		.catch(err => {
-			console.log("Error sending message", err);
+			console.log("Error sending message:", err);
 			res.status(500).send({error: "Error sending message"})
 		});
 });
