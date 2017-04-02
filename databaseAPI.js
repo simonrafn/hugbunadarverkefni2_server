@@ -183,7 +183,7 @@ module.exports = (function() {
 
     function existsFriendRequest (senderId, receiverId) {
     	return new Promise((resolve,reject) => {
-    		let sql = "SELECT sender_id, receiver_id FROM requests " + 
+    		let sql = "SELECT sender_id, receiver_id FROM requests " +
     					"WHERE sender_id = ? AND receiver_id = ?";
     		db.get(sql, [senderId, receiverId], (err,row) => {
     			if(err) reject(err);

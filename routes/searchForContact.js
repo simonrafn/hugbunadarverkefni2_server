@@ -9,12 +9,16 @@ var router = express.Router();
 var database = require('../databaseAPI.js');
 
 router.post('/', function(req, res, next) {
-	var searchString = req.body.searchString;
 	res.setHeader('Content-Type', 'application/json');
-	// res.send({ response : "searchForContact"});
-	database.searchForContact(searchString)
-		.then(function(result) { if(result) { res.send({ userId : result.id, username : result.username }); } else { res.status(500); } })
-		.catch( function(error) { console.log("Error searching for contact: ", error); res.status(500); } );
+	database.searchForContact(req.body.searchString)
+		.then(result => { 
+			if(result) res.send({ userId : result.id, username : result.username }); 
+			else res.status(404).send({success: "User not found"}); 
+		})
+		.catch( err => { 
+			console.log("Error searching for contact: ", error); 
+			res.status(500).send({error: "Error searching for contact"}); 
+		});
 });
 
 module.exports = router;

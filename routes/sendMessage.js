@@ -11,7 +11,6 @@ var database = require('../databaseAPI.js');
 var firebase = require('../util/firebase/firebase.js')
 
 router.post('/', function(req, res, next) {
-	var userIdToken = req.body.firebaseUserIdToken;
 	var content = req.body.content;
 	var senderId = req.body.senderId;
 	var receiverId = req.body.receiverId;

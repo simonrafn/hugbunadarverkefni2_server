@@ -20,7 +20,7 @@ router.post('/unblock', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	
 	database.unblockContact(req.body.userId, req.body.subjectId)
-		.then(_ => res.status(200).send({sucess: "Contact has been unblocked"}))
+		.then(_ => res.status(200).send({success: "Contact has been unblocked"}))
 		.catch(err => {
 			console.log("Error unblocking contact:", err);
 			res.status(500).send({error: "Error unblocking contact"});
@@ -66,10 +66,11 @@ router.post('/add', function(req, res, next) {
 			if(!areFriends) return database.getInstanceTokens(subjectId);
 		})
 		.then(instanceTokens => {
-			if(instanceTokens && instanceTokens.length != 0) firebase.sendMessage(instanceTokens, payload);
+			if(instanceTokens && instanceTokens.length != 0) return firebase.sendMessage(instanceTokens, payload);
+			return false;
 		})
-		.then(_ => {
-			database.addFriendRequest(userId, subjectId);
+		.then(addToDatabase => {
+			if(addToDatabase) database.addFriendRequest(userId, subjectId);
 		})
 		.then(_ => res.status(200).send({success: "Friend request has been sent"}))
 		.catch(err => {

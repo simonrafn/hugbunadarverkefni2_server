@@ -10,23 +10,23 @@ var database = require('../databaseAPI.js');
 
 router.post('/', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
-	var uid = req.user.uid;
-	var instanceToken = req.user.instanceToken;
-	var username = req.user.fullname;
-	var email = req.user.email;
-
+	
 	// uid = Math.floor(1000000*Math.random());
 	// instanceToken = Math.floor(1000000*Math.random());
 	// username = "Bill"+uid;
 
 	// get the userId from the database and send the result to the client app
-	database.insertOrUpdateUser(uid, instanceToken, username, email)
+	database.insertOrUpdateUser(
+			req.user.uid, 
+			req.user.instanceToken, 
+			req.user.fullname, 
+			req.user.email)
 		.then(function(userId) { 
-			res.send({ userId : userId }); 
+			res.send({ success: "You have been registered", userId: userId }); 
 		})
 		.catch(err => {
 			console.log("Error registering user: ", err);
-			res.status(500);
+			res.status(500).send({error: "Error registering user"});
 		});
 });
 
