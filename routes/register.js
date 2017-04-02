@@ -21,9 +21,7 @@ router.post('/', function(req, res, next) {
 			req.user.instanceToken, 
 			req.user.fullname, 
 			req.user.email)
-		.then(function(userId) { 
-			res.send({ success: "You have been registered", userId: userId }); 
-		})
+		.then(userId => res.send({ success: "You have been registered", userId: userId }))
 		.catch(err => {
 			console.log("Error registering user: ", err);
 			res.status(500).send({error: "Error registering user"});

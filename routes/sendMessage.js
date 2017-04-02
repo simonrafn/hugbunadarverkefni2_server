@@ -14,7 +14,7 @@ router.post('/', function(req, res, next) {
 	var content = req.body.content;
 	var senderId = req.body.senderId;
 	var receiverId = req.body.receiverId;
-	var sentDate = req.body.sentDate;
+	var sentTime = req.body.sentTime;
 
 	var payload = {
 		notification : {
@@ -26,15 +26,27 @@ router.post('/', function(req, res, next) {
 			content : content,
 			senderId : senderId,
 			receiverId : receiverId,
-			sentDate : sentDate
+			sentTime : sentTime
 		}
 	};
 
-	database.getInstanceTokens(receiverId)
-		.then(function(instanceTokens) { 
-			firebase.sendMessage(instanceTokens, payload); 
+	database.areFriends(senderId, receiverId)
+		.then(areFriends =>
+			if(areFriends) return database.getInstanceTokens(receiverId);
+			return false;
+		}
+		.then(instanceTokens => {
+			if(instanceTokens) return firebase.sendMessage(instanceTokens, payload);
+			return false;
+		})
+		.then(addToDatabase => {
+			if(addToDatabase) database.insertMessage(content, senderId, receiverId, sentTime);
+		}
+		.then(_ => res.send({success: "Message has been sent"}))
+		.catch(err => {
+			console.log("Error sending message", err);
+			res.status(500).send({error: "Error sending message"})
 		});
-	database.insertMessage(content, senderId, receiverId, sentDate);
 });
 
 module.exports = router;

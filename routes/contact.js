@@ -9,7 +9,7 @@ router.post('/block', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 
 	database.blockContact(req.body.userId, req.body.subjectId)
-		.then(_ => res.status(200).send({success: "Contact has been blocked"}))
+		.then(_ => res.send({success: "Contact has been blocked"}))
 		.catch(err => {
 			console.log("Error blocking contact:", err);
 			res.status(500).send({error: "Error blocking contact"});
@@ -20,7 +20,7 @@ router.post('/unblock', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	
 	database.unblockContact(req.body.userId, req.body.subjectId)
-		.then(_ => res.status(200).send({success: "Contact has been unblocked"}))
+		.then(_ => res.send({success: "Contact has been unblocked"}))
 		.catch(err => {
 			console.log("Error unblocking contact:", err);
 			res.status(500).send({error: "Error unblocking contact"});
@@ -31,7 +31,7 @@ router.post('/delete', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	
 	database.deleteContact(req.body.userId, req.body.subjectId)
-		.then(_ => res.status(200).send({success: "Contact has been deleted"}))
+		.then(_ => res.send({success: "Contact has been deleted"}))
 		.catch(err => {
 			console.log("Error deleting contact:", err);
 			res.status(500).send({error: "Error deleting contact"});
@@ -72,7 +72,7 @@ router.post('/add', function(req, res, next) {
 		.then(addToDatabase => {
 			if(addToDatabase) database.addFriendRequest(userId, subjectId);
 		})
-		.then(_ => res.status(200).send({success: "Friend request has been sent"}))
+		.then(_ => res.send({success: "Friend request has been sent"}))
 		.catch(err => {
 			console.log("Error sending friend request: ", err);
 			res.status(500).send({error: "Error sending friend request"});
@@ -102,7 +102,7 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 		.then(_ => database.deleteFriendRequest(subjectId, userId))
 		.then(_ => database.getInstanceTokens(subjectId))
 		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
-		.then(_ => res.status(200).send({success: "Friend request has been accepted"}))
+		.then(_ => res.send({success: "Friend request has been accepted"}))
 		.catch(err => { 
 			console.log("Error accepting friend request: ", err); 
 			res.status(500).send({error: "Error accepting friend request"}); 
@@ -115,7 +115,7 @@ router.post('/declineFriendRequest', function(req, res, next) {
 	var subjectId = req.body.subjectId;
 	// delete the friend request from the database
 	database.deleteFriendRequest(subjectId, userId)
-		.then(_ => res.status(200).send({success: "Friend request has been declined"}))
+		.then(_ => res.send({success: "Friend request has been declined"}))
 		.catch(err => { 
 			console.log("Error declining friend request: ", err); 
 			res.status(500).send({error: "Error declining friend request"}); 

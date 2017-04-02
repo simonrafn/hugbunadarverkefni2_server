@@ -15,7 +15,7 @@ router.post('/', function(req, res, next) {
 			if(result) res.send({ userId : result.id, username : result.username }); 
 			else res.status(404).send({success: "User not found"}); 
 		})
-		.catch( err => { 
+		.catch(err => { 
 			console.log("Error searching for contact: ", error); 
 			res.status(500).send({error: "Error searching for contact"}); 
 		});
