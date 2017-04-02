@@ -8,7 +8,10 @@ var router = express.Router();
 
 var database = require('../databaseAPI.js');
 
-module.exports = function(admin) {
+var admin;
+
+module.exports = function(ad) {
+	admin = ad;
 	router.post('/block', function(req, res, next) {
 		var userIdToken = req.body.firebaseUserIdToken;
 		res.setHeader('Content-Type', 'application/json');
@@ -70,11 +73,12 @@ module.exports = function(admin) {
 			data : {
 				messageType : "friendRequest",
 				senderUsername : "",
-				senderId : senderId,
-				receiverId : receiverId
+				senderId : userId,
+				receiverId : subjectId
 			}
 		};
 
+		console.log("before auth");
 		// verify the user, get the username, check if the friend request already exists, check if the users are already friends, 
 		// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
 		admin.auth().verifyIdToken(userIdToken)

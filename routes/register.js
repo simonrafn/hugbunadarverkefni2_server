@@ -8,36 +8,25 @@ var router = express.Router();
 
 var database = require('../databaseAPI.js');
 
-var admin;
+router.post('/', function(req, res, next) {
+	res.setHeader('Content-Type', 'application/json');
+	var uid = req.user.uid;
+	var instanceToken = req.user.instanceToken;
+	var username = req.user.fullname;
+	var email = req.user.email;
 
-module.exports = function(ad) {
-	admin = ad;
-	router.post('/', function(req, res, next) {
-		var userIdToken = req.body.firebaseUserIdToken;
-		var instanceToken = req.body.firebaseInstanceIdToken;
+	uid = Math.floor(1000000*Math.random());
+	username = "Bill"+uid;
 
-		// verify the user
-		admin.auth().verifyIdToken(userIdToken)
-			.then(function(decodedToken) {
-			var uid = decodedToken.uid; // uid is unique and persistent, it can be used to identify the user
-
-			// get the user data
-			admin.auth().getUser(uid)
-				.then(function(userRecord) {
-				// console.log("Successfully fetched user data:", userRecord.toJSON());
-				var username = userRecord.displayName;
-				var email = userRecord.email;
-				res.setHeader('Content-Type', 'application/json');
-				// get the userId from the database and send the result to the client app
-				database.insertOrUpdateUser(uid, instanceToken, username, email).then(function(userId) { res.send({ userId : userId }); });
-			}).catch(function(error) {
-				console.log("Error fetching user data: ", error);
-			});
-		}).catch(function(error) {
-			// Handle error
-			console.log("Error registering user ", error);
+	// get the userId from the database and send the result to the client app
+	database.insertOrUpdateUser(uid, instanceToken, username, email)
+		.then(function(userId) { 
+			res.send({ userId : userId }); 
+		})
+		.catch(err => {
+			console.log("Error registering user: ", err);
+			res.status(500);
 		});
-	});
+});
 
-	return router;
-}
+module.exports = router;

@@ -49,23 +49,23 @@ module.exports = (function() {
         return new Promise(function(resolve, reject) {
             let userSql = "INSERT INTO users (firebase_uid, email, username) VALUES (?, ?, ?)";
             let tokenSql = "INSERT INTO tokens (id, instance_token) values (?, ?)";
-            var userId;
             db.serialize(function() {
                 db.run("BEGIN");
                 db.run(userSql, [uid, email, username], function(err) {
                     if(err) {
                         reject(err)
                     }
-                    userId = this.lastID;
+                    let userId = this.lastID;
+                    console.log("userId should be: ", userId);
                     db.run(tokenSql, [userId, instanceToken], function(err) {
                         if(err) {
                             db.run("ROLLBACK");
                             reject(err);
                         }
+                        resolve(userId)
                     });
                 });
                 db.run("COMMIT");
-                resolve(userId)
             });
         });
     }
@@ -220,6 +220,7 @@ module.exports = (function() {
     }
 
     return {
+        addFriendRequest : addFriendRequest,
 	    deleteFriendRequest : deleteFriendRequest,
 	    areFriends : areFriends,
 	    existsFriendRequest : existsFriendRequest,

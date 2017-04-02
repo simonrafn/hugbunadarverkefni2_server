@@ -8,18 +8,8 @@ var bodyParser = require('body-parser');
 
 var app = express();
 
+var firebase = require('./util/firebase/firebase.js');
 
-/* firebase start */
-var admin = require("firebase-admin");
-var serviceAccount = require("./cloudmessagingtest2-246fb-firebase-adminsdk-ebnkx-0e73aedfec.json");
-// var serviceAccount = require("path/to/serviceAccountKey.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://cloudmessagingtest2-246fb.firebaseio.com/"
-  // databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
-});
-/* firebase end */
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,9 +23,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// routes
+var register = require('./routes/register');
+app.use('/register', firebase.requireAuth, firebase.requireUserDetails, register);
+
+var sendMessage = require('./routes/sendMessage');
+app.use('/sendMessage', firebase.requireAuth, sendMessage);
+
+var contact = require('./routes/contact');
+app.use('/contact', contact);
+
+var searchForContact = require('./routes/searchForContact');
+app.use('/searchForContact', searchForContact);
+
+/*
+
 // routes
 var register = require('./routes/register')(admin);
-app.use('/register', register);
+app.use('/register', firebase.requireAuth, firebase.requireUserDetails, register);
 
 var sendMessage = require('./routes/sendMessage')(admin);
 app.use('/sendMessage', sendMessage);
@@ -46,12 +52,13 @@ app.use('/contact', contact);
 var searchForContact = require('./routes/searchForContact');
 app.use('/searchForContact', searchForContact);
 
+*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
 
 // error handler
