@@ -199,7 +199,7 @@ module.exports = (function() {
     	return new Promise((resolve,reject) => {
     		let sql = " SELECT user_id FROM contacts " + 
     				" WHERE user_id = ? AND friend_id = ?";
-			db.get(sql, [userId, otherId, otherId, userId], (err,row) => {
+			db.get(sql, [userId, otherId], (err,row) => {
 				if(err) reject(err);
 				if(row)
 					resolve(true);
