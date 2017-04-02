@@ -32,7 +32,7 @@ var sendMessage = require('./routes/sendMessage');
 app.use('/sendMessage', firebase.requireAuth, sendMessage);
 
 var contact = require('./routes/contact');
-app.use('/contact', contact);
+app.use('/contact', firebase.requireAuth, firebase.requireUserDetails, contact);
 
 var searchForContact = require('./routes/searchForContact');
 app.use('/searchForContact', searchForContact);

@@ -108,6 +108,8 @@ module.exports = (function() {
         return new Promise(function(resolve, reject) {
             let sql = "SELECT instance_token FROM tokens WHERE id = ?";
             db.all(sql, [userId], function(err, rows) {
+                console.log("getInstanceTokens: err\n", err);
+                console.log("getInstanceTokens: rows\n", rows);
                 if(err) reject(err);
                 resolve(rows.map(row => row.instance_token));
             });
@@ -195,9 +197,8 @@ module.exports = (function() {
 
     function areFriends (userId, otherId) {
     	return new Promise((resolve,reject) => {
-    		let sql = " SELECT sender_id FROM requests " + 
-    				" WHERE (sender_id = ? AND receiver_id = ?) " +
-    				" OR (sender_id = ? AND receiver_id = ?) ";
+    		let sql = " SELECT user_id FROM contacts " + 
+    				" WHERE user_id = ? AND friend_id = ?";
 			db.get(sql, [userId, otherId, otherId, userId], (err,row) => {
 				if(err) reject(err);
 				if(row)

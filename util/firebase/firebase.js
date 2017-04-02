@@ -23,8 +23,7 @@ function requireAuth (req, res, next) {
 	})
 	.catch(e => {
 		console.log("Error authenticating user:", e);
-		res.status(401);
-		res.send("Permission required");
+		res.status(401).send({error: "Permission required"});
 	});
 }
 
@@ -40,8 +39,7 @@ function requireUserDetails (req, res, next) {
 	})
 	.catch(e => {
 		console.log("Error getting user data:", e);
-		res.status(404);
-		res.send("Resource not found");
+		res.status(404).send({error: "Resource not found"});
 	});
 }
 
@@ -54,7 +52,8 @@ function sendMessage(instanceTokens, payload) {
 		// the contents of response.
 		console.log("Successfully sent message:", response);
 	}) .catch(function(error) {
-		console.log("Error sending message:", error);
+		console.log("Error sending message of type: " + payload.data.messageType);
+		console.log("Error:", error);
 	});
 }
 

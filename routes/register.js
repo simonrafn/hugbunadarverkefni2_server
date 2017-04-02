@@ -15,8 +15,9 @@ router.post('/', function(req, res, next) {
 	var username = req.user.fullname;
 	var email = req.user.email;
 
-	uid = Math.floor(1000000*Math.random());
-	username = "Bill"+uid;
+	// uid = Math.floor(1000000*Math.random());
+	// instanceToken = Math.floor(1000000*Math.random());
+	// username = "Bill"+uid;
 
 	// get the userId from the database and send the result to the client app
 	database.insertOrUpdateUser(uid, instanceToken, username, email)
