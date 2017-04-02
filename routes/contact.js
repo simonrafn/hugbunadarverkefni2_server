@@ -1,15 +1,9 @@
 'use strict';
-// start node servernum:
-// cd C:\Users\Notandi\Documents\GitHub\hugbunadarverkefni2_server
-// npm start
 
 var express = require('express');
 var router = express.Router();
-
 var database = require('../databaseAPI.js');
-
 var firebase = require('../util/firebase/firebase.js');
-
 
 router.post('/block', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
@@ -21,6 +15,7 @@ router.post('/block', function(req, res, next) {
 			res.status(500).send({error: "Error blocking contact"});
 		});
 });
+
 router.post('/unblock', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	
@@ -31,6 +26,7 @@ router.post('/unblock', function(req, res, next) {
 			res.status(500).send({error: "Error unblocking contact"});
 		});
 });
+
 router.post('/delete', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	
@@ -41,6 +37,7 @@ router.post('/delete', function(req, res, next) {
 			res.status(500).send({error: "Error deleting contact"});
 		});
 });
+
 router.post('/add', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	var userId = req.body.userId;
@@ -79,8 +76,8 @@ router.post('/add', function(req, res, next) {
 			console.log("Error sending friend request: ", err);
 			res.status(500).send({error: "Error sending friend request"});
 		});
-
 });
+
 router.post('/acceptFriendRequest', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	var userId = req.body.userId;
@@ -101,7 +98,6 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 	// delete the friend request and send the sender of the friend request a message that it has been accepted
 	database.addContact(userId, subjectId)
 		.then(_ => database.addContact(subjectId, userId))
-		.then(_ => database.addContact(userId, subjectId))
 		.then(_ => database.deleteFriendRequest(subjectId, userId))
 		.then(_ => database.getInstanceTokens(subjectId))
 		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
@@ -111,6 +107,7 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 			res.status(500).send({error: "Error accepting friend request"}); 
 		});
 });
+
 router.post('/declineFriendRequest', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	var userId = req.body.userId;
