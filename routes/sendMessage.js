@@ -11,11 +11,11 @@ var database = require('../databaseAPI.js');
 var firebase = require('../util/firebase/firebase.js')
 
 router.post('/', function(req, res, next) {
-	var content, = req.body.content,;
-	var senderId, = req.body.senderId,;
-	var receiverId, = req.body.receiverId,;
+	var content = req.body.content;
+	var senderId = req.body.senderId;
+	var receiverId = req.body.receiverId;
 	var sentTime = req.body.sentTime;
-	
+
 	var payload = {
 		// notification : {
 		// 	title : "",

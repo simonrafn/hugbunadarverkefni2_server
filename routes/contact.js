@@ -55,9 +55,15 @@ router.post('/add', function(req, res, next) {
 		}
 	};
 
-	// check if the friend request already exists, check if the users are already friends, 
-	// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
-	database.existsFriendRequest(userId, subjectId)
+
+	/* User was a friend of subject, but has since deleted subject
+		while subject is still a friend of user */
+	database.isOneSidedFriendship(userId, subjectId)
+		.then( _ => {
+			// check if the friend request already exists, check if the users are already friends, 
+			// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
+			return database.existsFriendRequest(userId, subjectId)
+		})
 		.then(existsFriendRequest => {
 			if(!existsFriendRequest) return database.areFriends(userId, subjectId);
 			throw "The friend request already exists";

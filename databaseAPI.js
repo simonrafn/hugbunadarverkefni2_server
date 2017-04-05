@@ -235,7 +235,26 @@ module.exports = (function() {
     	});
     }
 
+    function fixOneSidedFriendship (readder, deleted) {
+        return new Promise( (resolve,reject) => {
+            let sql = "SELECT EXISTS (SELECT * FROM contacts WHERE " + 
+                    "(user_id = ? AND friend_id = ?) AND NOT (user_id = 2 AND friend_id = 1) )";
+            db.get(sql, [readder, deleted, deleted, readder], (err, res) => {
+                if(err) {
+                    console.log("error: fixOneSidedFriendship");
+                    reject(err);
+                }
+                if(res) {
+                    addContact(readder, deleted).then(resolve);
+                } else {
+                    resolve(false);
+                }
+            })
+        });
+    }
+
     return {
+        fixOneSidedFriendship : fixOneSidedFriendship,
         hasBlocked : hasBlocked,
         addFriendRequest : addFriendRequest,
 	    deleteFriendRequest : deleteFriendRequest,
