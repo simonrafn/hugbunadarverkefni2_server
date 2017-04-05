@@ -43,15 +43,15 @@ router.post('/add', function(req, res, next) {
 	var userId = req.body.userId;
 	var subjectId = req.body.subjectId;
 	var payload = {
-		notification : {
-			title : "",
-			body : req.user.fullname + " wants to be your friend"
-		},
+		// notification : {
+		// 	title : "",
+		// 	body : req.user.fullname + " wants to be your friend"
+		// },
 		data : {
-			messageType : "friendRequest",
-			senderUsername : req.user.fullname,
-			senderId : userId,
-			receiverId : subjectId
+			messageType 	: "friendRequest",
+			senderUsername 	: req.user.fullname,
+			senderId 		: userId,
+			receiverId 		: subjectId
 		}
 	};
 
@@ -80,10 +80,10 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 	var userId = req.body.userId;
 	var subjectId = req.body.subjectId;
 	var payload = {
-		notification : {
-			title : "",
-			body : req.user.fullname + " has accepted your friend request."
-		},
+		// notification : {
+		// 	title : "",
+		// 	body : req.user.fullname + " has accepted your friend request."
+		// },
 		data : {
 			messageType : "friendResponse",
 			accepterUsername : req.user.fullname,
