@@ -23,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // routes
 var register = require('./routes/register');
 app.use('/register', firebase.requireAuth, firebase.requireUserDetails, register);
@@ -36,23 +35,6 @@ app.use('/contact', firebase.requireAuth, firebase.requireUserDetails, contact);
 
 var searchForContact = require('./routes/searchForContact');
 app.use('/searchForContact', searchForContact);
-
-/*
-
-// routes
-var register = require('./routes/register')(admin);
-app.use('/register', firebase.requireAuth, firebase.requireUserDetails, register);
-
-var sendMessage = require('./routes/sendMessage')(admin);
-app.use('/sendMessage', sendMessage);
-
-var contact = require('./routes/contact')(admin);
-app.use('/contact', contact);
-
-var searchForContact = require('./routes/searchForContact');
-app.use('/searchForContact', searchForContact);
-
-*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
