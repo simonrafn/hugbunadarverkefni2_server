@@ -127,7 +127,7 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 		// },
 		data : {
 			messageType : "friendResponse",
-			accepterUsername : req.user.fullname,
+			senderUsername : req.user.fullname,
 			senderId : userId,
 			receiverId : subjectId
 		}
