@@ -23,10 +23,10 @@ router.post('/', function(req, res, next) {
 		// },
 		data : {
 			messageType		: "chatMessage",
-			content			: req.body.content,
-			senderId		: req.body.senderId,
-			receiverId		: req.body.receiverId,
-			sentTime		: req.body.sentTime
+			content			: content,
+			senderId		: senderId,
+			receiverId		: receiverId,
+			sentTime		: sentTime
 		}
 	};
 
@@ -47,7 +47,7 @@ router.post('/', function(req, res, next) {
 		.then(instanceTokens => {
 			firebase.sendMessage(instanceTokens, payload)
 		})
-		.then(addToDatabase => {
+		.then(_ => {
 			database.insertMessage(content, senderId, receiverId, sentTime)
 		})
 		.then(_ => { 

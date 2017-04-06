@@ -150,7 +150,7 @@ module.exports = (function() {
     function setBlocked(blockerId, blockedId, blockedState) {
         return new Promise(function(resolve, reject) {
             let sql = "UPDATE contacts SET blocked = ? WHERE user_id=? AND friend_id = ?";
-            db.run(sql, [blockerId, blockedId, blockedState], function(err) {
+            db.run(sql, [blockedState, blockerId, blockedId], function(err) {
                 if(err) reject(err);
                 resolve();
             })
@@ -159,7 +159,7 @@ module.exports = (function() {
 
     function blockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, 1);};
 
-    function unblockContact (blockerId, blockedId) { return setBlocked(blockerId, blockedId, 0);};
+    function unblockContact (unblockerId, unblockedId) { return setBlocked(unblockerId, unblockedId, 0);};
 
     function deleteContact (deleterId, deletedId) {
         return new Promise(function(resolve, reject) {

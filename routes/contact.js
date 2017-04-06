@@ -29,8 +29,23 @@ router.post('/unblock', function(req, res, next) {
 
 router.post('/delete', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
-	
-	database.deleteContact(req.body.userId, req.body.subjectId)
+	var userId = req.body.userId;
+	var subjectId = req.body.subjectId;
+
+	var payload = {
+		data : {
+			messageType 	: "deleteRequest",
+			senderUsername 	: req.user.fullname,
+			senderId 		: userId,
+			receiverId 		: subjectId
+		}
+	};
+
+	// delete the connection from both directions and send the person who was deleted that they should remove the deleter from their contact list
+	database.deleteContact(userId, subjectId)
+		.then(_ => database.deleteContact(subjectId, userId))
+		.then(_ => database.getInstanceTokens(subjectId))
+		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
 		.then(_ => res.send({success: "Contact has been deleted"}))
 		.catch(err => {
 			console.log("Error deleting contact:", err);
@@ -55,15 +70,10 @@ router.post('/add', function(req, res, next) {
 		}
 	};
 
-
-	/* User was a friend of subject, but has since deleted subject
-		while subject is still a friend of user */
-	database.isOneSidedFriendship(userId, subjectId)
-		.then( _ => {
-			// check if the friend request already exists, check if the users are already friends, 
-			// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
-			return database.existsFriendRequest(userId, subjectId)
-		})
+	
+	// check if the friend request already exists, check if the users are already friends, 
+	// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
+	database.existsFriendRequest(userId, subjectId)
 		.then(existsFriendRequest => {
 			if(!existsFriendRequest) return database.areFriends(userId, subjectId);
 			throw "The friend request already exists";
@@ -73,12 +83,37 @@ router.post('/add', function(req, res, next) {
 			throw "The users are already friends";
 		})
 		.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
-		.then(addToDatabase => database.addFriendRequest(userId, subjectId))
+		.then(_ => database.addFriendRequest(userId, subjectId))
 		.then(_ => res.send({success: "Friend request has been sent"}))
 		.catch(err => {
 			console.log("Error sending friend request: ", err);
 			res.status(500).send({error: "Error sending friend request"});
 		});
+
+
+	// /* User was a friend of subject, but has since deleted subject
+	// 	while subject is still a friend of user */
+	// database.isOneSidedFriendship(userId, subjectId)
+	// 	.then(_ => {
+	// 		// check if the friend request already exists, check if the users are already friends, 
+	// 		// get the instance tokens of the receiver and then send the friend request to the right devices and add it to the database
+	// 		return database.existsFriendRequest(userId, subjectId)
+	// 	})
+	// 	.then(existsFriendRequest => {
+	// 		if(!existsFriendRequest) return database.areFriends(userId, subjectId);
+	// 		throw "The friend request already exists";
+	// 	})
+	// 	.then(areFriends => {
+	// 		if(!areFriends) return database.getInstanceTokens(subjectId);
+	// 		throw "The users are already friends";
+	// 	})
+	// 	.then(instanceTokens => firebase.sendMessage(instanceTokens, payload))
+	// 	.then(_ => database.addFriendRequest(userId, subjectId))
+	// 	.then(_ => res.send({success: "Friend request has been sent"}))
+	// 	.catch(err => {
+	// 		console.log("Error sending friend request: ", err);
+	// 		res.status(500).send({error: "Error sending friend request"});
+	// 	});
 });
 
 router.post('/acceptFriendRequest', function(req, res, next) {
@@ -113,10 +148,8 @@ router.post('/acceptFriendRequest', function(req, res, next) {
 
 router.post('/declineFriendRequest', function(req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
-	var userId = req.body.userId;
-	var subjectId = req.body.subjectId;
 	// delete the friend request from the database
-	database.deleteFriendRequest(subjectId, userId)
+	database.deleteFriendRequest(req.body.subjectId, req.body.userId)
 		.then(_ => res.send({success: "Friend request has been declined"}))
 		.catch(err => { 
 			console.log("Error declining friend request: ", err); 
